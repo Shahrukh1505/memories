@@ -3,6 +3,7 @@ import { AppBar,Avatar,Button,Toolbar,Typography } from '@material-ui/core'
 import useStyles from './styles.js';
 import memories from '../../images/memories.png';
 import {Link} from 'react-router-dom';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
 const Navbar = () => {
 
     const classes = useStyles();

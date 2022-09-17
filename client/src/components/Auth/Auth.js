@@ -2,12 +2,19 @@ import React, {useState} from 'react'
 import {Avatar, Button, Paper, Grid, Typography, Container} from '@material-ui/core';
 import Input from './Input.js';
 import useStyles from './styles';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { GoogleLogin,googleLogout } from '@react-oauth/google';
 const Auth = () => {
   const classes = useStyles();
-  const isSignUp = false;
+  const [isSignUp,setSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+  const user = false;
+  const switchMode = () => {
+    setSignUp((prev) => !prev);
+    handleShowPassword(false);
+}
+
   const handleSubmit = () => {
 
   }
@@ -42,6 +49,29 @@ const Auth = () => {
             <Button type="submit" fullWidth variant="contained" color ="primary" className = {classes.submit}>
               {isSignUp ? 'Sign Up' : 'Sign In'}
             </Button>
+            <GoogleOAuthProvider clientId={process.env.REACT_APP_NEXT_PUBLIC_GOOGLE_API_TOKEN}>
+                            <div>
+                                {user ? (
+                                    <>
+                                        <div>
+
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <GoogleLogin onSuccess={(res) => console.log(res)}/>
+                                    </>
+                                )}
+                            </div>
+                    </GoogleOAuthProvider>
+
+                    <Grid container justifyContent='flex-end'>
+                        <Grid item>
+                            <Button onClick={switchMode}>
+                                {isSignUp ? 'Already have an account? Sign in' : 'New User? Sign up'}
+                            </Button>
+                        </Grid>
+                    </Grid>
           </form>
       </Paper>
     </Container>
