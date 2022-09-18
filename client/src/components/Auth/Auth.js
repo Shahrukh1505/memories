@@ -8,18 +8,31 @@ import jwt_decode from 'jwt-decode';
 import useStyles from './styles.js';
 import Input from './Input.js';
 import Icon from './Icon.js';
+import { useHistory } from 'react-router-dom';
+import {signin, signup} from '../../actions/auth';
+const initialState = {firstName: '', lastName: '', email: '', password: '', confirmPassword: ''};
 const Auth = () => {
   const classes = useStyles();
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setSignUp] = useState(false);
+  const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
   const user = false;
+const history = useHistory();
 
   const handleShowPassword = () => setShowPassword((prev) => !prev);
-  const handleSubmit = () => {
-
+  const handleSubmit = (e) => {
+           e.preventDefault();
+      
+           if(isSignUp){
+            dispatch(signup(formData, history));
+           }
+           else{
+            dispatch(signup(formData, history));
+           }
   };
-  const handleChange = () => {
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.name]: e.target.value})
 
   };
   const switchMode = () => {
@@ -33,7 +46,9 @@ const Auth = () => {
       const result = jwt_decode(res?.credential);
     
       try {
-          dispatch({type: 'AUTH', data: {result}})
+          dispatch({type: 'AUTH', data: {result}});
+          history.push('/');
+
       } catch (error) {
           console.log(error);
       }
