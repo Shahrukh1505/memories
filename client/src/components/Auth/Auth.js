@@ -1,29 +1,49 @@
-import React, {useState} from 'react'
+import React, {useState} from 'react';
 import {Avatar, Button, Paper, Grid, Typography, Container} from '@material-ui/core';
-import Input from './Input.js';
-import useStyles from './styles';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { GoogleLogin,googleLogout } from '@react-oauth/google';
+import {GoogleOAuthProvider} from '@react-oauth/google';
+import {GoogleLogin, googleLogout} from '@react-oauth/google';
+import {useDispatch} from 'react-redux';
+import jwt_decode from 'jwt-decode';
+import useStyles from './styles.js';
+import Input from './Input.js';
+import Icon from './Icon.js';
 const Auth = () => {
   const classes = useStyles();
-  const [isSignUp,setSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isSignUp, setSignUp] = useState(false);
+  const dispatch = useDispatch();
   const user = false;
-  const switchMode = () => {
-    setSignUp((prev) => !prev);
-    handleShowPassword(false);
-}
 
+  const handleShowPassword = () => setShowPassword((prev) => !prev);
   const handleSubmit = () => {
 
-  }
+  };
   const handleChange = () => {
 
-  }
-  const handleShowPassword = () => setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+  const switchMode = () => {
+      setSignUp((prev) => !prev);
+      handleShowPassword(false);
+  };
 
- 
+  // google auth funcs
+  const googleSuccess = async (res) => {
+      console.log(res);
+      const result = jwt_decode(res?.credential);
+    
+      try {
+          dispatch({type: 'AUTH', data: {result}})
+      } catch (error) {
+          console.log(error);
+      }
+  };
+  const googleFailure = (error) => {
+      const ERR = 'Google sign in was unsuccessful. Please, try again later.';
+      console.log(ERR);
+      console.log(error);
+  };
+
   return (
     <Container component = "main" maxWidth="xs">
       <Paper className = {classes.paper} elevation={3}>
@@ -50,19 +70,24 @@ const Auth = () => {
               {isSignUp ? 'Sign Up' : 'Sign In'}
             </Button>
             <GoogleOAuthProvider clientId={process.env.REACT_APP_NEXT_PUBLIC_GOOGLE_API_TOKEN}>
-                            <div>
-                                {user ? (
-                                    <>
-                                        <div>
-
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <GoogleLogin onSuccess={(res) => console.log(res)}/>
-                                    </>
-                                )}
-                            </div>
+                        <GoogleLogin 
+                            render={(renderProps) => (
+                                <Button
+                                    className={classes.googleButton}
+                                    color='primary'
+                                    fullWidth
+                                    onClick={renderProps.onClick}
+                                    disabled={renderProps.disabled}
+                                    startIcon={<Icon/>}
+                                    variant='contained'
+                                >
+                                    Google Sign in
+                                </Button>
+                            )}
+                            onSuccess={googleSuccess}
+                            onFailure={googleFailure}
+                            cookiePolicy='single_host_origin'
+                        />
                     </GoogleOAuthProvider>
 
                     <Grid container justifyContent='flex-end'>
