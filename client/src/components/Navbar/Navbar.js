@@ -2,7 +2,7 @@ import React,{useState, useEffect} from 'react'
 import { AppBar,Avatar,Button,Toolbar,Typography } from '@material-ui/core'
 import useStyles from './styles.js';
 import memories from '../../images/memories.png';
-
+import decode from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import {Link, useHistory, useLocation } from 'react-router-dom';
 const Navbar = () => {
@@ -13,18 +13,27 @@ const Navbar = () => {
     const location = useLocation();
     console.log(user);
         const dispatch = useDispatch();
-    useEffect(()=>{
-        const data = user?.credentials;
+
+        const logout = () => {
+            dispatch({type:'LOGOUT'});
+            history.push('/');
+            setUser(null);
+        }
+
+         useEffect(()=>{
+          const token = user?.token;
+
+        if(token){
+            const decodedToken = decode(token);
+              
+            if(decodedToken.exp * 1000 < new Date().getTime()) logout();
+        }
 
         setUser(JSON.parse(localStorage.getItem('profile')));
 
     },[location]);
 
-    const logout = () => {
-dispatch({type:'LOGOUT'});
-history.push('/');
-setUser(null);
-    }
+  
 
   return (
     <AppBar className = {classes.appBar} position='static' color = 'inherit'>
